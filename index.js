@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 client.connect(err => {
     const Eventscollection = client.db(DB_NAME).collection("events");
+    const usersCollection = client.db(DB_NAME).collection("users");
     console.log('Database Connected')
     // perform actions on the collection object
     // client.close();
@@ -28,7 +29,16 @@ client.connect(err => {
         Eventscollection.insertOne(events)
             .then(result => {
                 console.log(result)
-                res.send(result.insertedCount > 0)    
+                res.send(result.insertedCount > 0)
+            })
+    })
+
+    app.post('/addUsers', (req, res) => {
+        const user = req.body;
+        usersCollection.insertOne(user)
+            .then(result => {
+                console.log(result)
+                res.send(result.insertedCount > 0)
             })
     })
 
@@ -36,6 +46,13 @@ client.connect(err => {
         Eventscollection.find({})
             .toArray((error, document) => {
                 res.send(document)
+            })
+    })
+
+    app.get("/event/:id", (req, res) => {
+        Eventscollection.find({ id: req.params._id })
+            .toArray((error, documents) => {
+                res.send(documents[0])
             })
     })
 
